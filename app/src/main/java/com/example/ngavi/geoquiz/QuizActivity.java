@@ -5,11 +5,29 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class QuizActivity extends AppCompatActivity {
     private Button mTrueButton;
     private Button mFalseButton;
+    private Button mNextButton;
+    private TextView mQuestionTextView;
+    //array of questions :
+    private TrueFalse[] mQuestionBank = new TrueFalse[] {
+            new TrueFalse(R.string.question_africa, false),
+            new TrueFalse(R.string.question_americas, true),
+            new TrueFalse(R.string.question_asia, true),
+            new TrueFalse(R.string.question_mideast, false),
+            new TrueFalse(R.string.question_oceans, true),
+
+    };
+    private int mCurrentIndex = 0;
+
+
+
+
+
 
     //in order to wire up button widgets - get references to inflated view objects
         //set listeners on those objects to respond to user actions
@@ -29,6 +47,11 @@ public class QuizActivity extends AppCompatActivity {
         //now to references the buttons and set them to the private variables above
             //findViewById is a method that retrieves a view ID from R.java
 
+        //getting the TextView of the current question
+        mQuestionTextView = findViewById(R.id.question_text_view);
+         int question = mQuestionBank[mCurrentIndex].getQuestion();
+        mQuestionTextView.setText(question);
+
         mTrueButton =  findViewById(R.id.true_button); //must cast to Button object
         //these buttons are waiting for an event (user pressing a button)
         //we need listeners to obtain that information
@@ -41,7 +64,7 @@ public class QuizActivity extends AppCompatActivity {
                 //use toast class method to create toast- makeText
 
                 Toast.makeText(QuizActivity.this, R.string.incorrect_toast,Toast.LENGTH_SHORT).show();
-                //ctrl +shift +space to finish
+                //ctrl +shift +space to finish autocomplete
             }
                                        });
 
@@ -50,6 +73,16 @@ public class QuizActivity extends AppCompatActivity {
             @Override
             public void onClick(View v){
                 Toast.makeText(QuizActivity.this, R.string.correct_toast, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        mNextButton = findViewById(R.id.next_button);
+        mNextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mCurrentIndex =(mCurrentIndex+1) % mQuestionBank.length;
+               int question = mQuestionBank[mCurrentIndex].getQuestion();
+                mQuestionTextView.setText(question);
             }
         });
 
