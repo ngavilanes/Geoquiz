@@ -1,13 +1,58 @@
 package com.example.ngavi.geoquiz;
 
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 
 public class QuizActivity extends AppCompatActivity {
+    private Button mTrueButton;
+    private Button mFalseButton;
+
+    //in order to wire up button widgets - get references to inflated view objects
+        //set listeners on those objects to respond to user actions
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) { //called when activity subclass is created
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quiz);
+        //getting the activity its UI BY passing in layout resource ID
+        //resources: things that are not code : image files, audio files, XML files
+        //setContentView method inflates a layout and puts it on screen
+        //R.layout.activity quiz comes from layout inner class of R.java
+            //not every widget in the layout has an ID- must be generated in XML file
+            //android:id="blah"
+        //strings would be referred to as setTitle(R.string.(name))
+
+        //now to references the buttons and set them to the private variables above
+            //findViewById is a method that retrieves a view ID from R.java
+
+        mTrueButton =  findViewById(R.id.true_button); //must cast to Button object
+        //these buttons are waiting for an event (user pressing a button)
+        //we need listeners to obtain that information
+        mTrueButton.setOnClickListener(new View.OnClickListener(){ //takes listener as argument
+            @Override
+            public void onClick(View v){
+                //anonymous inner class- puts entire implementation of listener methods in one place
+                //must implement sole method OnClick(View v)
+                //on click a message should appear --> a toast
+                //use toast class method to create toast- makeText
+
+                Toast.makeText(QuizActivity.this, R.string.incorrect_toast,Toast.LENGTH_SHORT).show();
+                //ctrl +shift +space to finish
+            }
+                                       });
+
+        mFalseButton =  findViewById(R.id.false_button);
+        mFalseButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Toast.makeText(QuizActivity.this, R.string.correct_toast, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
     }
 }
