@@ -25,8 +25,29 @@ public class QuizActivity extends AppCompatActivity {
     private int mCurrentIndex = 0;
 
 
+    private void UpdateQuestion(){ //method to update questions
+       int question = mQuestionBank[mCurrentIndex].getQuestion();
+        mQuestionTextView.setText(question);
+    }
+
+    private void CheckAnswer(boolean UserPressedTrue){ //private method to check the truth value of each question
+        boolean AnswerIsTrue = mQuestionBank[mCurrentIndex].isTrueQuestion();
+        int messageResId =0;
+
+        if(UserPressedTrue==AnswerIsTrue){ //question is true and user pressed it correctly
+            messageResId = R.string.correct_toast;
+        }
+        else{
+            messageResId = R.string.incorrect_toast;
+        }
 
 
+        //on click a message should appear --> a toast
+        //use toast class method to create toast- makeText
+        Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show();
+
+
+    }
 
 
     //in order to wire up button widgets - get references to inflated view objects
@@ -40,30 +61,22 @@ public class QuizActivity extends AppCompatActivity {
         //resources: things that are not code : image files, audio files, XML files
         //setContentView method inflates a layout and puts it on screen
         //R.layout.activity quiz comes from layout inner class of R.java
-            //not every widget in the layout has an ID- must be generated in XML file
+            //not every widget in the layout has an ID- it must be generated in XML file
             //android:id="blah"
         //strings would be referred to as setTitle(R.string.(name))
 
         //now to references the buttons and set them to the private variables above
             //findViewById is a method that retrieves a view ID from R.java
 
-        //getting the TextView of the current question
-        mQuestionTextView = findViewById(R.id.question_text_view);
-         int question = mQuestionBank[mCurrentIndex].getQuestion();
-        mQuestionTextView.setText(question);
 
-        mTrueButton =  findViewById(R.id.true_button); //must cast to Button object
+
+        mTrueButton =  findViewById(R.id.true_button);
         //these buttons are waiting for an event (user pressing a button)
         //we need listeners to obtain that information
         mTrueButton.setOnClickListener(new View.OnClickListener(){ //takes listener as argument
             @Override
             public void onClick(View v){
-                //anonymous inner class- puts entire implementation of listener methods in one place
-                //must implement sole method OnClick(View v)
-                //on click a message should appear --> a toast
-                //use toast class method to create toast- makeText
-
-                Toast.makeText(QuizActivity.this, R.string.incorrect_toast,Toast.LENGTH_SHORT).show();
+                CheckAnswer(true);
                 //ctrl +shift +space to finish autocomplete
             }
                                        });
@@ -72,19 +85,24 @@ public class QuizActivity extends AppCompatActivity {
         mFalseButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
-                Toast.makeText(QuizActivity.this, R.string.correct_toast, Toast.LENGTH_SHORT).show();
+                CheckAnswer(false);
             }
         });
+
+        //getting the TextView of the current question
+        mQuestionTextView = findViewById(R.id.question_text_view);
 
         mNextButton = findViewById(R.id.next_button);
         mNextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mCurrentIndex =(mCurrentIndex+1) % mQuestionBank.length;
-               int question = mQuestionBank[mCurrentIndex].getQuestion();
-                mQuestionTextView.setText(question);
+                UpdateQuestion();
             }
         });
+
+        UpdateQuestion();
+
 
 
     }
