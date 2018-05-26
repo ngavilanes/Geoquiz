@@ -5,13 +5,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class QuizActivity extends AppCompatActivity {
     private Button mTrueButton;
     private Button mFalseButton;
-    private Button mNextButton;
+    private ImageButton mNextButton;
+    private ImageButton mPrevButton;
     private TextView mQuestionTextView;
     //array of questions :
     private TrueFalse[] mQuestionBank = new TrueFalse[] {
@@ -32,7 +34,7 @@ public class QuizActivity extends AppCompatActivity {
 
     private void CheckAnswer(boolean UserPressedTrue){ //private method to check the truth value of each question
         boolean AnswerIsTrue = mQuestionBank[mCurrentIndex].isTrueQuestion();
-        int messageResId =0;
+        int messageResId;
 
         if(UserPressedTrue==AnswerIsTrue){ //question is true and user pressed it correctly
             messageResId = R.string.correct_toast;
@@ -91,6 +93,26 @@ public class QuizActivity extends AppCompatActivity {
 
         //getting the TextView of the current question
         mQuestionTextView = findViewById(R.id.question_text_view);
+        mQuestionTextView.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                mCurrentIndex = (mCurrentIndex+1) % mQuestionBank.length;
+                UpdateQuestion();
+            }
+
+
+        });
+        mPrevButton= findViewById(R.id.prev_button);
+        mPrevButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mCurrentIndex -=1;
+                if(mCurrentIndex==-1){
+                    mCurrentIndex= mQuestionBank.length-1;
+                }
+                UpdateQuestion();
+            }
+        });
 
         mNextButton = findViewById(R.id.next_button);
         mNextButton.setOnClickListener(new View.OnClickListener() {
@@ -100,6 +122,8 @@ public class QuizActivity extends AppCompatActivity {
                 UpdateQuestion();
             }
         });
+
+
 
         UpdateQuestion();
 
