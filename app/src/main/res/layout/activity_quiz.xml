@@ -34,18 +34,17 @@
 
         <ImageButton
             android:id="@+id/prev_button"
-            android:layout_width="wrap_content"
+            android:layout_width="@android:dimen/app_icon_size"
             android:layout_height="wrap_content"
-            android:src="@mipmap/arrow_left"
             android:contentDescription="@string/prev_button"
-            />
+            android:src="@mipmap/arrow_left" />
 
         <ImageButton
             android:id="@+id/next_button"
-            android:layout_width="wrap_content"
+            android:layout_width="@android:dimen/app_icon_size"
             android:layout_height="wrap_content"
-            android:src="@mipmap/arrow_right"
-            android:contentDescription="@string/next_button" />
+            android:contentDescription="@string/next_button"
+            android:src="@mipmap/arrow_right" />
     </LinearLayout>
 
 </LinearLayout>
