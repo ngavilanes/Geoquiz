@@ -1,6 +1,8 @@
 package com.example.ngavi.geoquiz;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,9 +15,16 @@ import android.widget.Toast;
 public class QuizActivity extends AppCompatActivity {
     private Button mTrueButton;
     private Button mFalseButton;
+    private Button mCheatButton;
     private ImageButton mNextButton;
     private ImageButton mPrevButton;
+    private boolean mIsCheater;
     private TextView mQuestionTextView;
+    private int mCurrentIndex = 0;
+    public static final int REQUEST_CODE_CHEAT = 0;
+    private static final String TAG = "QuizActivity";
+    private static final String KEY_INDEX = "index";
+
     //array of questions :
     private TrueFalse[] mQuestionBank = new TrueFalse[] {
             new TrueFalse(R.string.question_africa, false),
@@ -25,44 +34,17 @@ public class QuizActivity extends AppCompatActivity {
             new TrueFalse(R.string.question_oceans, true),
 
     };
-    private int mCurrentIndex = 0;
-    private static final String TAG = "QuizActivity";
-    private static final String KEY_INDEX = "index";
 
-
-    private void UpdateQuestion(){ //method to update questions
-       int question = mQuestionBank[mCurrentIndex].getQuestion();
-        mQuestionTextView.setText(question);
-    }
-
-    private void CheckAnswer(boolean UserPressedTrue){ //private method to check the truth value of each question
-        boolean AnswerIsTrue = mQuestionBank[mCurrentIndex].isTrueQuestion();
-        int messageResId;
-
-        if(UserPressedTrue==AnswerIsTrue){ //question is true and user pressed it correctly
-            messageResId = R.string.correct_toast;
-        }
-        else{
-            messageResId = R.string.incorrect_toast;
-        }
-
-
-        //on click a message should appear --> a toast
-        //use toast class method to create toast- makeText
-        Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show();
-
-
-    }
-
-
-    //in order to wire up button widgets - get references to inflated view objects
-        //set listeners on those objects to respond to user actions
 
     @Override
-    protected void onCreate(final Bundle savedInstanceState) { //called when activity subclass is created
+    protected void onCreate( Bundle savedInstanceState) { //called when activity subclass is created
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_quiz);
         Log.d(TAG, "OnCreate(Bundle) called");
+
+        if(savedInstanceState!=null){ //saving information every time you do a rotation
+            mCurrentIndex = savedInstanceState.getInt(KEY_INDEX,0);
+        }
         //getting the activity its UI BY passing in layout resource ID
         //resources: things that are not code : image files, audio files, XML files
         //setContentView method inflates a layout and puts it on screen
@@ -76,7 +58,9 @@ public class QuizActivity extends AppCompatActivity {
 
 
 
+      //  mTrueButton =  findViewById(R.id.true_button);
         mTrueButton =  findViewById(R.id.true_button);
+
         //these buttons are waiting for an event (user pressing a button)
         //we need listeners to obtain that information
         mTrueButton.setOnClickListener(new View.OnClickListener(){ //takes listener as argument
@@ -96,7 +80,7 @@ public class QuizActivity extends AppCompatActivity {
         });
 
         //getting the TextView of the current question
-        mQuestionTextView = findViewById(R.id.question_text_view);
+       mQuestionTextView = findViewById(R.id.question_text_view);
         mQuestionTextView.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v){
@@ -115,9 +99,7 @@ public class QuizActivity extends AppCompatActivity {
                     mCurrentIndex= mQuestionBank.length-1;
                 }
 
-                if(savedInstanceState!=null){
-                    mCurrentIndex = savedInstanceState.getInt(KEY_INDEX,0);
-                }
+
                 UpdateQuestion();
             }
         });
@@ -126,10 +108,30 @@ public class QuizActivity extends AppCompatActivity {
         mNextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mIsCheater= false;
                 mCurrentIndex =(mCurrentIndex+1) % mQuestionBank.length;
                 UpdateQuestion();
             }
         });
+
+        mCheatButton = findViewById(R.id.cheat_button);
+        mCheatButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+               //setting up new activity - requires an intent which communicates with the OS to start the cheat activity
+               //set up intent using constructor: Intent(context,class);
+
+               Intent intent = new Intent(QuizActivity.this, CheatActivity.class);
+               boolean AnswerIsTrue = mQuestionBank[mCurrentIndex].isTrueQuestion();
+               intent.putExtra(CheatActivity.EXTRA_ANSWER_IS_TRUE,AnswerIsTrue);
+               startActivityForResult(intent,REQUEST_CODE_CHEAT);
+
+            }
+
+
+                                        });
+
+
 
 
 
@@ -138,6 +140,53 @@ public class QuizActivity extends AppCompatActivity {
 
 
     }
+
+    private void UpdateQuestion(){ //method to update questions
+        int question = mQuestionBank[mCurrentIndex].getQuestion();
+        mQuestionTextView.setText(question);
+        //Log.d(TAG,"Updating question text for question #: " + mCurrentIndex, new Exception());
+
+    }
+
+    private void CheckAnswer(boolean UserPressedTrue){ //private method to check the truth value of each question
+        boolean AnswerIsTrue = mQuestionBank[mCurrentIndex].isTrueQuestion();
+        int messageResId;
+        if(mIsCheater==true){
+            messageResId = R.string.judegement_toast;
+        }
+        else {
+            if (UserPressedTrue == AnswerIsTrue) { //question is true and user pressed it correctly
+                messageResId = R.string.correct_toast;
+            } else {
+                messageResId = R.string.incorrect_toast;
+            }
+        }
+
+
+        //on click a message should appear --> a toast
+        //use toast class method to create toast- makeText
+        Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show();
+
+
+    }
+
+    @Override
+    protected void onActivityResult(int RequestCode, int ResultCode, Intent Data){
+        if(ResultCode != Activity.RESULT_OK){
+            return;
+        }
+        if(RequestCode==REQUEST_CODE_CHEAT){
+            if(Data ==null){
+                return;
+            }
+            mIsCheater= CheatActivity.WasAnswerShown(Data);
+        }
+    }
+
+
+    //in order to wire up button widgets - get references to inflated view objects
+    //set listeners on those objects to respond to user actions
+
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState){
         super.onSaveInstanceState(savedInstanceState);
