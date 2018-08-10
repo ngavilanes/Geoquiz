@@ -56,4 +56,20 @@
             android:src="@mipmap/arrow_right" />
     </LinearLayout>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/NumCheatsTextView"
+        android:paddingTop="20dp"
+        />
+
+
+    <TextView
+        android:id="@+id/VersionTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+
+         />
+
 </LinearLayout>

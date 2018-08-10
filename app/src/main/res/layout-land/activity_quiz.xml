@@ -12,25 +12,49 @@
         android:padding="24dp" />
 
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical|center_horizontal"
-        android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/true_button"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/true_button" />
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/false_button"
+            <Button
+                android:id="@+id/true_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/true_button" />
+
+            <Button
+                android:id="@+id/false_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/false_button" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/NumCheatsTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/false_button" />
+            android:layout_gravity="center"
+            android:layout_marginTop="40dp"
 
-    </LinearLayout>
+            />
+
+
+
+
+
+    <TextView
+            android:id="@+id/VersionTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_margin="20dp"
+            />
+
+
 
     <Button
         android:id="@+id/cheat_button"

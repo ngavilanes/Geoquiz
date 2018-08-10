@@ -3,6 +3,7 @@ package com.example.ngavi.geoquiz;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class QuizActivity extends AppCompatActivity {
+
     private Button mTrueButton;
     private Button mFalseButton;
     private Button mCheatButton;
@@ -20,6 +22,8 @@ public class QuizActivity extends AppCompatActivity {
     private ImageButton mPrevButton;
     private boolean mIsCheater;
     private TextView mQuestionTextView;
+    private TextView mNumberOfCheatsTextView;
+    private TextView mAPITextView;
     private int mCurrentIndex = 0;
     public static final int REQUEST_CODE_CHEAT = 0;
     private static final String TAG = "QuizActivity";
@@ -27,11 +31,11 @@ public class QuizActivity extends AppCompatActivity {
 
     //array of questions :
     private TrueFalse[] mQuestionBank = new TrueFalse[] {
-            new TrueFalse(R.string.question_africa, false),
-            new TrueFalse(R.string.question_americas, true),
-            new TrueFalse(R.string.question_asia, true),
-            new TrueFalse(R.string.question_mideast, false),
-            new TrueFalse(R.string.question_oceans, true),
+            new TrueFalse(R.string.question_africa, false,false),
+            new TrueFalse(R.string.question_americas, true,false),
+            new TrueFalse(R.string.question_asia, true,false),
+            new TrueFalse(R.string.question_mideast, false,false),
+            new TrueFalse(R.string.question_oceans, true,false),
 
     };
 
@@ -42,8 +46,9 @@ public class QuizActivity extends AppCompatActivity {
         setContentView(R.layout.activity_quiz);
         Log.d(TAG, "OnCreate(Bundle) called");
 
-        if(savedInstanceState!=null){ //saving information every time you do a rotation
+        if(savedInstanceState!=null){ //saving information every time you change orientation
             mCurrentIndex = savedInstanceState.getInt(KEY_INDEX,0);
+            mIsCheater = savedInstanceState.getBoolean("index2", false);
         }
         //getting the activity its UI BY passing in layout resource ID
         //resources: things that are not code : image files, audio files, XML files
@@ -56,6 +61,13 @@ public class QuizActivity extends AppCompatActivity {
         //now to references the buttons and set them to the private variables above
             //findViewById is a method that retrieves a view ID from R.java
 
+
+        mAPITextView= findViewById(R.id.VersionTextView);
+        mAPITextView.setText("API Version: " + Build.VERSION.SDK_INT);
+
+
+        mNumberOfCheatsTextView = findViewById(R.id.NumCheatsTextView);
+        mNumberOfCheatsTextView.setText("Number of cheats left: " + mQuestionBank[mCurrentIndex].getnumcheats());
 
 
       //  mTrueButton =  findViewById(R.id.true_button);
@@ -121,7 +133,7 @@ public class QuizActivity extends AppCompatActivity {
                //setting up new activity - requires an intent which communicates with the OS to start the cheat activity
                //set up intent using constructor: Intent(context,class);
 
-               Intent intent = new Intent(QuizActivity.this, CheatActivity.class);
+               Intent intent = new Intent(QuizActivity.this, CheatActivity.class); //intent class parameters : 1->where you're starting from  2-> where you're going
                boolean AnswerIsTrue = mQuestionBank[mCurrentIndex].isTrueQuestion();
                intent.putExtra(CheatActivity.EXTRA_ANSWER_IS_TRUE,AnswerIsTrue);
                startActivityForResult(intent,REQUEST_CODE_CHEAT);
@@ -151,7 +163,8 @@ public class QuizActivity extends AppCompatActivity {
     private void CheckAnswer(boolean UserPressedTrue){ //private method to check the truth value of each question
         boolean AnswerIsTrue = mQuestionBank[mCurrentIndex].isTrueQuestion();
         int messageResId;
-        if(mIsCheater==true){
+        if(mIsCheater==true || mQuestionBank[mCurrentIndex].getCheated()==true){
+            mQuestionBank[mCurrentIndex].setCheated(true);
             messageResId = R.string.judegement_toast;
         }
         else {
@@ -192,6 +205,8 @@ public class QuizActivity extends AppCompatActivity {
         super.onSaveInstanceState(savedInstanceState);
         Log.i(TAG, "onSaveInstanceState");
         savedInstanceState.putInt(KEY_INDEX,mCurrentIndex);
+        savedInstanceState.putBoolean("index2", mIsCheater);
+        savedInstanceState.putInt("index3",mQuestionBank[mCurrentIndex].getnumcheats());
     }
 
 
