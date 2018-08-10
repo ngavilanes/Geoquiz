@@ -28,6 +28,7 @@ public class QuizActivity extends AppCompatActivity {
     public static final int REQUEST_CODE_CHEAT = 0;
     private static final String TAG = "QuizActivity";
     private static final String KEY_INDEX = "index";
+    private int mnumcheats = 3;
 
     //array of questions :
     private TrueFalse[] mQuestionBank = new TrueFalse[] {
@@ -49,6 +50,7 @@ public class QuizActivity extends AppCompatActivity {
         if(savedInstanceState!=null){ //saving information every time you change orientation
             mCurrentIndex = savedInstanceState.getInt(KEY_INDEX,0);
             mIsCheater = savedInstanceState.getBoolean("index2", false);
+            mnumcheats = savedInstanceState.getInt("index3", 3);
         }
         //getting the activity its UI BY passing in layout resource ID
         //resources: things that are not code : image files, audio files, XML files
@@ -67,7 +69,8 @@ public class QuizActivity extends AppCompatActivity {
 
 
         mNumberOfCheatsTextView = findViewById(R.id.NumCheatsTextView);
-        mNumberOfCheatsTextView.setText("Number of cheats left: " + mQuestionBank[mCurrentIndex].getnumcheats());
+        mNumberOfCheatsTextView.setText("Number of cheats left: " + mnumcheats);
+
 
 
       //  mTrueButton =  findViewById(R.id.true_button);
@@ -156,6 +159,7 @@ public class QuizActivity extends AppCompatActivity {
     private void UpdateQuestion(){ //method to update questions
         int question = mQuestionBank[mCurrentIndex].getQuestion();
         mQuestionTextView.setText(question);
+        mNumberOfCheatsTextView.setText("Number of cheats left: " + mnumcheats);
         //Log.d(TAG,"Updating question text for question #: " + mCurrentIndex, new Exception());
 
     }
@@ -163,22 +167,34 @@ public class QuizActivity extends AppCompatActivity {
     private void CheckAnswer(boolean UserPressedTrue){ //private method to check the truth value of each question
         boolean AnswerIsTrue = mQuestionBank[mCurrentIndex].isTrueQuestion();
         int messageResId;
-        if(mIsCheater==true || mQuestionBank[mCurrentIndex].getCheated()==true){
-            mQuestionBank[mCurrentIndex].setCheated(true);
-            messageResId = R.string.judegement_toast;
+        if(mIsCheater==true){
+            if(mnumcheats>0) {
+                mnumcheats--;
+                mNumberOfCheatsTextView.setText("Number of cheats left: " + mnumcheats);
+                mIsCheater=false;
+            }
+
         }
-        else {
+
+        if(mnumcheats>0 || !mIsCheater) {
             if (UserPressedTrue == AnswerIsTrue) { //question is true and user pressed it correctly
                 messageResId = R.string.correct_toast;
             } else {
                 messageResId = R.string.incorrect_toast;
             }
         }
+        else{
+            messageResId = R.string.judegement_toast;
+        }
+
+        Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show();
+
 
 
         //on click a message should appear --> a toast
         //use toast class method to create toast- makeText
-        Toast.makeText(this, messageResId, Toast.LENGTH_SHORT).show();
+
+
 
 
     }
@@ -206,7 +222,7 @@ public class QuizActivity extends AppCompatActivity {
         Log.i(TAG, "onSaveInstanceState");
         savedInstanceState.putInt(KEY_INDEX,mCurrentIndex);
         savedInstanceState.putBoolean("index2", mIsCheater);
-        savedInstanceState.putInt("index3",mQuestionBank[mCurrentIndex].getnumcheats());
+        savedInstanceState.putInt("index3",mnumcheats);
     }
 
 
